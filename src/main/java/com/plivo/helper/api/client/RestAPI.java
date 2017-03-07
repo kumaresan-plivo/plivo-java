@@ -28,7 +28,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.ProtocolVersion;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 
@@ -86,14 +88,14 @@ public class RestAPI {
 		return this;
 	}
 
-	public String request(String method, String resource, LinkedHashMap<String, String> parameters) 
+	public String request(String method, String resource, Map<String, String> parameters)
 			throws PlivoException
 	{
 		HttpResponse response = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1),
 				HttpStatus.SC_OK, "OK");
 		String json = "";
 		try {
-			if ( method == "GET" ) {
+			if (method.equals("GET")) {
 				// Prepare a String with GET parameters
 				String getparams = "?";
 				for ( Entry<String, String> pair : parameters.entrySet() )
@@ -104,7 +106,7 @@ public class RestAPI {
 				HttpGet httpget = new HttpGet(this.BaseURI + resource + getparams);
 				response = this.Client.execute(httpget);
 			}
-			else if ( method == "POST" ) {
+			else if (method.equals("POST")) {
 				HttpPost httpost = new HttpPost(this.BaseURI + resource);
 				Gson gson = new GsonBuilder().serializeNulls().create();
 				// Create a String entity with the POST parameters
@@ -114,7 +116,7 @@ public class RestAPI {
 				httpost.setEntity(se);
 				response = this.Client.execute(httpost);
 			}
-			else if ( method == "DELETE" ) {
+			else if (method.equals("DELETE")) {
 				HttpDelete httpdelete = new HttpDelete(this.BaseURI + resource);
 				response = this.Client.execute(httpdelete);
 			}
@@ -240,28 +242,46 @@ public class RestAPI {
                 new LinkedHashMap<String, String>()), CDR.class);
     }
 
-    public LiveCallFactory getLiveCalls() throws PlivoException {
-        LinkedHashMap<String, String> parameters= new LinkedHashMap<String, String>();
-        parameters.put("status", "live");
-        return this.gson.fromJson(request("GET", "/Call/", parameters), LiveCallFactory.class);
+    public CallListFactory getInProgressCalls() throws PlivoException {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("status", "in-progress");
+        return this.gson.fromJson(request("GET", "/Call/", parameters), CallListFactory.class);
     }
 
-    public LiveCall getLiveCall(LinkedHashMap<String, String> parameters) throws PlivoException {
+    public CallListFactory getRingingCalls() throws PlivoException {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("status", "ringing");
+        return this.gson.fromJson(request("GET", "/Call/", parameters), CallListFactory.class);
+    }
+
+    public CallListFactory getQueuedCalls() throws PlivoException {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("status", "queued");
+        return this.gson.fromJson(request("GET", "/Call/", parameters), CallListFactory.class);
+    }
+
+    public CallListFactory getLiveCalls() throws PlivoException {
+        LinkedHashMap<String, String> parameters= new LinkedHashMap<String, String>();
+        parameters.put("status", "live");
+        return this.gson.fromJson(request("GET", "/Call/", parameters), CallListFactory.class);
+    }
+
+    public CallStatus getLiveCall(LinkedHashMap<String, String> parameters) throws PlivoException {
         String call_uuid = getKeyValue(parameters, "call_uuid");
         parameters.put("status", "live");
-        return this.gson.fromJson(request("GET", String.format("/Call/%s/", call_uuid), parameters), LiveCall.class);
+        return this.gson.fromJson(request("GET", String.format("/Call/%s/", call_uuid), parameters), CallStatus.class);
     }
 
     public Call makeCall(LinkedHashMap<String, String> parameters) throws PlivoException {
     	String to = parameters.get("to");
-    	if (to!=null && to.indexOf("<")!=-1)
+    	if (to!=null && to.contains("<"))
     		throw new PlivoException("Use the makeBulkCall() method to make calls to multiple numbers.");
         return this.gson.fromJson(request("POST", "/Call/", parameters), Call.class);
     }
     
     public BulkCall makeBulkCall(LinkedHashMap<String, String> parameters) throws PlivoException {
     	String to = parameters.get("to");
-    	if (to!=null && to.indexOf("<")==-1)
+    	if (to!=null && !to.contains("<"))
     		throw new PlivoException("Use the makeCall() method to make calls to a single number.");
         return this.gson.fromJson(request("POST", "/Call/", parameters), BulkCall.class);
     }

@@ -2,7 +2,7 @@ package com.plivo.helper.api.response.call;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LiveCall {
+public class CallStatus {
 	@SerializedName("server_code")
 	public Integer serverCode ;
 
@@ -29,13 +29,13 @@ public class LiveCall {
     
     public String error ;
     
-    public LiveCall() {
+    public CallStatus() {
         // empty
     }
 
 	@Override
 	public String toString() {
-		return "LiveCall [serverCode=" + serverCode + ", direction="
+		return "CallStatus [serverCode=" + serverCode + ", direction="
 				+ direction + ", from=" + from + ", callStatus=" + callStatus
 				+ ", apiId=" + apiId + ", to=" + to + ", callerName="
 				+ callerName + ", callUuuid=" + callUuuid + ", sessionStart="

@@ -1,1 +1,1 @@
-Creating almost empoty javadoc.jar file
+Creating almost empty javadoc.jar file

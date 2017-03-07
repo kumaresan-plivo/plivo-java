@@ -3,7 +3,7 @@ package com.plivo.helper.api.response.call;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class LiveCallFactory {
+public class CallListFactory {
 	@SerializedName("server_code")
 	public Integer serverCode ;
 
@@ -11,18 +11,18 @@ public class LiveCallFactory {
     public String apiId ;
     
     @SerializedName("calls")
-    public List<String> liveCallList ;
+    public List<String> callList;
     
     public String error ;
     
-    public LiveCallFactory() {
+    public CallListFactory() {
         // empty
     }
 
 	@Override
 	public String toString() {
-		return "LiveCallFactory [serverCode=" + serverCode + ", apiId=" + apiId
-				+ ", liveCallList=" + liveCallList + ", error=" + error + "]";
+		return "CallListFactory [serverCode=" + serverCode + ", apiId=" + apiId
+				+ ", callList=" + callList + ", error=" + error + "]";
 	}
     
 }
